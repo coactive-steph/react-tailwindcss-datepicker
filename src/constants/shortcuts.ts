@@ -6,51 +6,51 @@ const DEFAULT_SHORTCUTS: {
 } = {
     today: {
         text: "Today",
-        period: {
+        period: () => ({
             start: formatDate(set_day_start(_dayjs())),
             end: formatDate(_dayjs())
-        }
+        })
     },
     yesterday: {
         text: "Yesterday",
-        period: {
+        period: () => ({
             start: formatDate(
                 _dayjs().subtract(1, "d").set("hour", 0).set("minute", 0).set("second", 0)
             ),
             end: formatDate(set_day_end(_dayjs().subtract(1, "d")))
-        }
+        })
     },
     past: [
         {
             daysNumber: 7,
             text: "Last 7 days",
-            period: {
+            period: () => ({
                 start: formatDate(_dayjs().subtract(7, "d")),
                 end: formatDate(_dayjs())
-            }
+            })
         },
         {
             daysNumber: 30,
             text: "Last 30 days",
-            period: {
+            period: () => ({
                 start: formatDate(_dayjs().subtract(30, "d")),
                 end: formatDate(_dayjs())
-            }
+            })
         }
     ],
     currentMonth: {
         text: "This month",
-        period: {
+        period: () => ({
             start: formatDate(_dayjs().startOf("month")),
             end: formatDate(_dayjs().endOf("month"))
-        }
+        })
     },
     pastMonth: {
         text: "Last month",
-        period: {
+        period: () => ({
             start: formatDate(previousMonth(_dayjs()).startOf("month")),
             end: formatDate(previousMonth(_dayjs()).endOf("month"))
-        }
+        })
     }
 };
 

@@ -1,16 +1,16 @@
 import React, { useCallback, useContext, useMemo } from "react";
 
-import { DATE_FORMAT, TEXT_COLOR } from "../constants";
+import { TEXT_COLOR } from "../constants";
 import DEFAULT_SHORTCUTS from "../constants/shortcuts";
 import DatepickerContext from "../contexts/DatepickerContext";
 import { Period, ShortcutsItem } from "../types";
 
-import { _dayjs } from "helpers";
+import { _dayjs, formatDate } from "helpers";
 
 interface ItemTemplateProps {
     children: JSX.Element;
     key: number;
-    item: ShortcutsItem | ShortcutsItem[];
+    item: ShortcutsItem;
 }
 
 // eslint-disable-next-line react/display-name
@@ -19,7 +19,6 @@ const ItemTemplate = React.memo((props: ItemTemplateProps) => {
         primaryColor,
         period,
         changePeriod,
-        changeInputText,
         updateFirstDate,
         dayHover,
         changeDayHover,
@@ -34,7 +33,7 @@ const ItemTemplate = React.memo((props: ItemTemplateProps) => {
         return `whitespace-nowrap w-1/2 md:w-1/3 lg:w-auto transition-all duration-300 hover:bg-gray-100 dark:hover:bg-white/10 p-2 rounded cursor-pointer ${textColor} ${textColorHover}`;
     }, [primaryColor]);
 
-    const chosePeriod = useCallback(
+    const choosePeriod = useCallback(
         (item: Period) => {
             if (dayHover) {
                 changeDayHover(null);
@@ -45,7 +44,6 @@ const ItemTemplate = React.memo((props: ItemTemplateProps) => {
                     end: null
                 });
             }
-            changeInputText(`${item.start} ~ ${item.end}`);
             changePeriod(item);
             changeDatepickerValue({
                 startDate: item.start,
@@ -57,7 +55,6 @@ const ItemTemplate = React.memo((props: ItemTemplateProps) => {
         [
             changeDatepickerValue,
             changeDayHover,
-            changeInputText,
             changePeriod,
             dayHover,
             hideDatepicker,
@@ -73,9 +70,10 @@ const ItemTemplate = React.memo((props: ItemTemplateProps) => {
         <li
             className={getClassName()}
             onClick={() => {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                chosePeriod(props?.item.period);
+                const period = props.item.period?.();
+                if (period) {
+                    choosePeriod(period);
+                }
             }}
         >
             {children}
@@ -102,8 +100,8 @@ const Shortcuts: React.FC = () => {
                     if (configs.shortcuts && configs?.shortcuts[item]) {
                         const customConfig = configs?.shortcuts[item];
                         const text = customConfig?.text;
-                        const start = _dayjs(customConfig?.period?.start);
-                        const end = _dayjs(customConfig?.period?.end);
+                        const start = _dayjs(customConfig?.period?.()?.start);
+                        const end = _dayjs(customConfig?.period?.().end);
                         if (
                             text &&
                             start.isValid() &&
@@ -114,10 +112,10 @@ const Shortcuts: React.FC = () => {
                                 item,
                                 {
                                     text,
-                                    period: {
-                                        start: start.format(DATE_FORMAT),
-                                        end: end.format(DATE_FORMAT)
-                                    }
+                                    period: () => ({
+                                        start: formatDate(start),
+                                        end: formatDate(end)
+                                    })
                                 }
                             ];
                         } else {

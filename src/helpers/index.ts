@@ -4,7 +4,7 @@ import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 import weekday from "dayjs/plugin/weekday";
 
-import { DATE_FORMAT, LANGUAGE } from "../constants";
+import { LANGUAGE } from "../constants";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -87,11 +87,11 @@ export function ucFirst(value: string) {
     return `${value[0].toUpperCase()}${value.slice(1, value.length)}`;
 }
 
-export function formatDate(date: dayjs.Dayjs, format = DATE_FORMAT) {
+export function formatDate(date: dayjs.Dayjs, format: string | undefined = undefined) {
     return date.format(format);
 }
 
-export function parseFormattedDate(date: string, format = DATE_FORMAT) {
+export function parseFormattedDate(date: string, format: string | undefined = undefined) {
     return dayjs(date, format).tz(CURRENT_TIMEZONE, true);
 }
 

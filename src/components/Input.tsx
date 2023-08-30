@@ -1,6 +1,6 @@
 import React, { useCallback, useContext, useEffect, useRef } from "react";
 
-import { BORDER_COLOR, DATE_FORMAT, RING_COLOR } from "../constants";
+import { BORDER_COLOR, RING_COLOR } from "../constants";
 import DatepickerContext from "../contexts/DatepickerContext";
 import { _dayjs, dateIsValid, parseFormattedDate } from "../helpers";
 
@@ -68,12 +68,12 @@ const Input: React.FC<Props> = (e: Props) => {
             const inputValue = e.target.value;
 
             const start = parseFormattedDate(inputValue.slice(0, 10), displayFormat).format(
-                DATE_FORMAT
+                displayFormat
             );
             const end = asSingle
                 ? start
                 : parseFormattedDate(inputValue.slice(11, inputValue.length), displayFormat).format(
-                      DATE_FORMAT
+                      displayFormat
                   );
 
             const input = inputRef?.current;
@@ -92,7 +92,7 @@ const Input: React.FC<Props> = (e: Props) => {
                     },
                     e.target
                 );
-                if (!asSingle) changeDayHover(_dayjs(end).add(-1, "day").format(DATE_FORMAT));
+                if (!asSingle) changeDayHover(_dayjs(end).add(-1, "day").format(displayFormat));
                 else changeDayHover(start);
                 hideDatepicker();
                 if (input) {

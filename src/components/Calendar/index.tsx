@@ -115,12 +115,12 @@ const Calendar: React.FC<Props> = ({
             let newStart;
             let newEnd = null;
 
-            function chosePeriod(start: string, end: string) {
+            function choosePeriod(start: string, end: string) {
                 const ipt = input?.current;
                 changeDatepickerValue(
                     {
-                        startDate: _dayjs(start).format("YYYY-MM-DD HH:mm:ss"),
-                        endDate: _dayjs(end).format("YYYY-MM-DD HH:mm:ss")
+                        startDate: formatDate(_dayjs(start)),
+                        endDate: formatDate(_dayjs(end))
                     },
                     ipt
                 );
@@ -144,7 +144,7 @@ const Calendar: React.FC<Props> = ({
                 newStart = fullDay;
                 if (asSingle) {
                     newEnd = fullDay;
-                    chosePeriod(fullDay, fullDay);
+                    choosePeriod(fullDay, fullDay);
                 }
             } else {
                 if (period.start && !period.end) {
@@ -167,7 +167,7 @@ const Calendar: React.FC<Props> = ({
 
                 if (!showFooter) {
                     if (newStart && newEnd) {
-                        chosePeriod(newStart, newEnd);
+                        choosePeriod(newStart, newEnd);
                     }
                 }
             }

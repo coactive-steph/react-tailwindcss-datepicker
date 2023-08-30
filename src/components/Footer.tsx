@@ -1,11 +1,10 @@
 import React, { useCallback, useContext } from "react";
 
-import { DATE_FORMAT } from "../constants";
 import DatepickerContext from "../contexts/DatepickerContext";
 
 import { PrimaryButton, SecondaryButton } from "./utils";
 
-import { _dayjs } from "helpers";
+import { _dayjs, formatDate } from "helpers";
 
 const Footer: React.FC = () => {
     // Contexts
@@ -35,8 +34,8 @@ const Footer: React.FC = () => {
                     onClick={() => {
                         if (period.start && period.end) {
                             changeDatepickerValue({
-                                startDate: _dayjs(period.start).format(DATE_FORMAT),
-                                endDate: _dayjs(period.end).format(DATE_FORMAT)
+                                startDate: formatDate(_dayjs(period.start)),
+                                endDate: formatDate(_dayjs(period.end))
                             });
                             hideDatepicker();
                         }

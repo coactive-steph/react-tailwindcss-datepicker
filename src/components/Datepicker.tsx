@@ -5,7 +5,7 @@ import Calendar from "../components/Calendar";
 import Footer from "../components/Footer";
 import Input from "../components/Input";
 import Shortcuts from "../components/Shortcuts";
-import { COLORS, DATE_FORMAT, DEFAULT_COLOR, LANGUAGE } from "../constants";
+import { COLORS, DEFAULT_COLOR, DEFAULT_DISPLAY_FORMAT, LANGUAGE } from "../constants";
 import DatepickerContext from "../contexts/DatepickerContext";
 import { _dayjs, formatDate, nextMonth, previousMonth } from "../helpers";
 import useOnClickOutside from "../hooks";
@@ -31,7 +31,7 @@ const Datepicker: React.FC<DatepickerType> = ({
     containerClassName = null,
     toggleClassName = null,
     toggleIcon = undefined,
-    displayFormat = DATE_FORMAT,
+    displayFormat = DEFAULT_DISPLAY_FORMAT,
     readOnly = false,
     minDate = null,
     maxDate = null,
@@ -131,14 +131,14 @@ const Datepicker: React.FC<DatepickerType> = ({
     /* Start Second */
     const secondGotoDate = useCallback(
         (date: dayjs.Dayjs) => {
-            const newDate = _dayjs(formatDate(date, displayFormat));
-            const reformatDate = _dayjs(formatDate(firstDate, displayFormat));
+            const newDate = _dayjs(formatDate(date));
+            const reformatDate = _dayjs(formatDate(firstDate));
             if (newDate.isSame(reformatDate) || newDate.isBefore(reformatDate)) {
                 setFirstDate(previousMonth(date));
             }
             setSecondDate(date);
         },
-        [firstDate, displayFormat]
+        [firstDate]
     );
 
     const previousMonthSecond = useCallback(() => {

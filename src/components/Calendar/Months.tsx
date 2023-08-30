@@ -1,9 +1,8 @@
-import dayjs from "dayjs";
 import React, { useContext } from "react";
 
 import { MONTHS } from "../../constants";
 import DatepickerContext from "../../contexts/DatepickerContext";
-import { loadLanguageModule } from "../../helpers";
+import { _dayjs, loadLanguageModule } from "../../helpers";
 import { RoundedButton } from "../utils";
 
 interface Props {

@@ -22,7 +22,7 @@ export interface Configs {
 export interface ShortcutsItem {
     text?: string;
     daysNumber?: number;
-    period?: {
+    period?: () => {
         start: string;
         end: string;
     };
