@@ -4,6 +4,7 @@ import React, { useCallback, useContext, useEffect, useMemo, useState } from "re
 import { CALENDAR_SIZE } from "../../constants";
 import DatepickerContext from "../../contexts/DatepickerContext";
 import {
+    _dayjs,
     formatDate,
     getDaysInMonth,
     getFirstDayInMonth,
@@ -118,8 +119,8 @@ const Calendar: React.FC<Props> = ({
                 const ipt = input?.current;
                 changeDatepickerValue(
                     {
-                        startDate: dayjs(start).format("YYYY-MM-DD"),
-                        endDate: dayjs(end).format("YYYY-MM-DD")
+                        startDate: _dayjs(start).format("YYYY-MM-DD HH:mm:ss"),
+                        endDate: _dayjs(end).format("YYYY-MM-DD HH:mm:ss")
                     },
                     ipt
                 );
@@ -150,16 +151,16 @@ const Calendar: React.FC<Props> = ({
                     // start not null
                     // end null
                     const condition =
-                        dayjs(fullDay).isSame(dayjs(period.start)) ||
-                        dayjs(fullDay).isAfter(dayjs(period.start));
+                        _dayjs(fullDay).isSame(_dayjs(period.start)) ||
+                        _dayjs(fullDay).isAfter(_dayjs(period.start));
                     newStart = condition ? period.start : fullDay;
                     newEnd = condition ? fullDay : period.start;
                 } else {
                     // Start null
                     // End not null
                     const condition =
-                        dayjs(fullDay).isSame(dayjs(period.end)) ||
-                        dayjs(fullDay).isBefore(dayjs(period.end));
+                        _dayjs(fullDay).isSame(_dayjs(period.end)) ||
+                        _dayjs(fullDay).isBefore(_dayjs(period.end));
                     newStart = condition ? fullDay : period.start;
                     newEnd = condition ? period.end : fullDay;
                 }

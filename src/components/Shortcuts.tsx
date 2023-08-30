@@ -1,10 +1,11 @@
-import dayjs from "dayjs";
 import React, { useCallback, useContext, useMemo } from "react";
 
 import { DATE_FORMAT, TEXT_COLOR } from "../constants";
 import DEFAULT_SHORTCUTS from "../constants/shortcuts";
 import DatepickerContext from "../contexts/DatepickerContext";
 import { Period, ShortcutsItem } from "../types";
+
+import { _dayjs } from "helpers";
 
 interface ItemTemplateProps {
     children: JSX.Element;
@@ -50,7 +51,7 @@ const ItemTemplate = React.memo((props: ItemTemplateProps) => {
                 startDate: item.start,
                 endDate: item.end
             });
-            updateFirstDate(dayjs(item.start));
+            updateFirstDate(_dayjs(item.start));
             hideDatepicker();
         },
         [
@@ -101,8 +102,8 @@ const Shortcuts: React.FC = () => {
                     if (configs.shortcuts && configs?.shortcuts[item]) {
                         const customConfig = configs?.shortcuts[item];
                         const text = customConfig?.text;
-                        const start = dayjs(customConfig?.period?.start);
-                        const end = dayjs(customConfig?.period?.end);
+                        const start = _dayjs(customConfig?.period?.start);
+                        const end = _dayjs(customConfig?.period?.end);
                         if (
                             text &&
                             start.isValid() &&

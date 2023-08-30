@@ -4,7 +4,7 @@ import React, { useCallback, useContext } from "react";
 
 import { BG_COLOR, TEXT_COLOR } from "../../constants";
 import DatepickerContext from "../../contexts/DatepickerContext";
-import { formatDate, nextMonth, previousMonth, classNames as cn } from "../../helpers";
+import { formatDate, nextMonth, previousMonth, classNames as cn, _dayjs } from "../../helpers";
 import { Period } from "../../types";
 
 dayjs.extend(isBetween);
@@ -47,7 +47,7 @@ const Days: React.FC<Props> = ({
             const itemDate = `${calendarData.date.year()}-${calendarData.date.month() + 1}-${
                 item >= 10 ? item : "0" + item
             }`;
-            if (formatDate(dayjs()) === formatDate(dayjs(itemDate)))
+            if (formatDate(_dayjs()) === formatDate(_dayjs(itemDate)))
                 return TEXT_COLOR["500"][primaryColor as keyof (typeof TEXT_COLOR)["500"]];
             return "";
         },
@@ -59,30 +59,35 @@ const Days: React.FC<Props> = ({
             const fullDay = `${calendarData.date.year()}-${calendarData.date.month() + 1}-${day}`;
             let className = "";
 
-            if (dayjs(fullDay).isSame(period.start) && dayjs(fullDay).isSame(period.end)) {
+            if (
+                _dayjs(fullDay).isSame(_dayjs(period.start)) &&
+                _dayjs(fullDay).isSame(_dayjs(period.end))
+            ) {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 className = ` ${BG_COLOR["500"][primaryColor]} text-white font-medium rounded-full`;
-            } else if (dayjs(fullDay).isSame(period.start)) {
+            } else if (_dayjs(fullDay).isSame(_dayjs(period.start))) {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 className = ` ${BG_COLOR["500"][primaryColor]} text-white font-medium ${
-                    dayjs(fullDay).isSame(dayHover) && !period.end
+                    _dayjs(fullDay).isSame(_dayjs(dayHover)) && !period.end
                         ? "rounded-full"
                         : "rounded-l-full"
                 }`;
-            } else if (dayjs(fullDay).isSame(period.end)) {
+            } else if (_dayjs(fullDay).isSame(_dayjs(period.end))) {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 className = ` ${BG_COLOR["500"][primaryColor]} text-white font-medium ${
-                    dayjs(fullDay).isSame(dayHover) && !period.start
+                    _dayjs(fullDay).isSame(_dayjs(dayHover)) && !period.start
                         ? "rounded-full"
                         : "rounded-r-full"
                 }`;
             }
 
             return {
-                active: dayjs(fullDay).isSame(period.start) || dayjs(fullDay).isSame(period.end),
+                active:
+                    _dayjs(fullDay).isSame(_dayjs(period.start)) ||
+                    _dayjs(fullDay).isSame(_dayjs(period.end)),
                 className: className
             };
         },
@@ -99,7 +104,9 @@ const Days: React.FC<Props> = ({
             if (period.start && period.end) {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
-                if (dayjs(fullDay).isBetween(period.start, period.end, "day", "[)")) {
+                if (
+                    _dayjs(fullDay).isBetween(_dayjs(period.start), _dayjs(period.end), "day", "[)")
+                ) {
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-ignore
                     return ` ${BG_COLOR["100"][primaryColor]} ${currentDateClass(
@@ -116,7 +123,10 @@ const Days: React.FC<Props> = ({
 
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
-            if (period.start && dayjs(fullDay).isBetween(period.start, dayHover, "day", "[)")) {
+            if (
+                period.start &&
+                _dayjs(fullDay).isBetween(_dayjs(period.start), _dayjs(dayHover), "day", "[)")
+            ) {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 className = ` ${BG_COLOR["100"][primaryColor]} ${currentDateClass(
@@ -126,7 +136,10 @@ const Days: React.FC<Props> = ({
 
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
-            if (period.end && dayjs(fullDay).isBetween(dayHover, period.end, "day", "[)")) {
+            if (
+                period.end &&
+                _dayjs(fullDay).isBetween(_dayjs(dayHover), _dayjs(period.end), "day", "[)")
+            ) {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 className = ` ${BG_COLOR["100"][primaryColor]} ${currentDateClass(
@@ -162,9 +175,9 @@ const Days: React.FC<Props> = ({
             const formattedDate = `${newDate.year()}-${newDate.month() + 1}-${
                 day >= 10 ? day : "0" + day
             }`;
-            return dayjs(formattedDate).isSame(dayjs(minDate))
+            return _dayjs(formattedDate).isSame(_dayjs(minDate))
                 ? false
-                : dayjs(formattedDate).isBefore(dayjs(minDate));
+                : _dayjs(formattedDate).isBefore(_dayjs(minDate));
         },
         [calendarData.date, minDate]
     );
@@ -183,9 +196,9 @@ const Days: React.FC<Props> = ({
             const formattedDate = `${newDate.year()}-${newDate.month() + 1}-${
                 day >= 10 ? day : "0" + day
             }`;
-            return dayjs(formattedDate).isSame(maxDate)
+            return _dayjs(formattedDate).isSame(_dayjs(maxDate))
                 ? false
-                : dayjs(formattedDate).isAfter(dayjs(maxDate));
+                : _dayjs(formattedDate).isAfter(_dayjs(maxDate));
         },
         [calendarData.date, maxDate]
     );
@@ -212,14 +225,14 @@ const Days: React.FC<Props> = ({
             let matchingCount = 0;
             disabledDates?.forEach(dateRange => {
                 if (
-                    dayjs(formattedDate).isAfter(dateRange.startDate) &&
-                    dayjs(formattedDate).isBefore(dateRange.endDate)
+                    _dayjs(formattedDate).isAfter(_dayjs(dateRange.startDate)) &&
+                    _dayjs(formattedDate).isBefore(_dayjs(dateRange.endDate))
                 ) {
                     matchingCount++;
                 }
                 if (
-                    dayjs(formattedDate).isSame(dateRange.startDate) ||
-                    dayjs(formattedDate).isSame(dateRange.endDate)
+                    _dayjs(formattedDate).isSame(_dayjs(dateRange.startDate)) ||
+                    _dayjs(formattedDate).isSame(_dayjs(dateRange.endDate))
                 ) {
                     matchingCount++;
                 }
@@ -248,8 +261,8 @@ const Days: React.FC<Props> = ({
             }
             for (let i = 0; i < disabledDates.length; i++) {
                 if (
-                    dayjs(hoverPeriod.start).isBefore(disabledDates[i].startDate) &&
-                    dayjs(hoverPeriod.end).isAfter(disabledDates[i].endDate)
+                    _dayjs(hoverPeriod.start).isBefore(_dayjs(disabledDates[i].startDate)) &&
+                    _dayjs(hoverPeriod.end).isAfter(_dayjs(disabledDates[i].endDate))
                 ) {
                     return true;
                 }
@@ -277,7 +290,7 @@ const Days: React.FC<Props> = ({
 
             if (period.start && !period.end) {
                 const hoverPeriod = { ...period, end: newHover };
-                if (dayjs(newHover).isBefore(dayjs(period.start))) {
+                if (_dayjs(newHover).isBefore(_dayjs(period.start))) {
                     hoverPeriod.start = newHover;
                     hoverPeriod.end = period.start;
                     if (!checkIfHoverPeriodContainsDisabledPeriod(hoverPeriod)) {
@@ -294,7 +307,7 @@ const Days: React.FC<Props> = ({
 
             if (!period.start && period.end) {
                 const hoverPeriod = { ...period, start: newHover };
-                if (dayjs(newHover).isAfter(dayjs(period.end))) {
+                if (_dayjs(newHover).isAfter(_dayjs(period.end))) {
                     hoverPeriod.start = period.end;
                     hoverPeriod.end = newHover;
                     if (!checkIfHoverPeriodContainsDisabledPeriod(hoverPeriod)) {
@@ -342,9 +355,9 @@ const Days: React.FC<Props> = ({
                 }`;
 
                 if (period.start && !period.end) {
-                    dayjs(clickDay).isSame(dayHover) && continueClick();
+                    _dayjs(clickDay).isSame(_dayjs(dayHover)) && continueClick();
                 } else if (!period.start && period.end) {
-                    dayjs(clickDay).isSame(dayHover) && continueClick();
+                    _dayjs(clickDay).isSame(_dayjs(dayHover)) && continueClick();
                 } else {
                     continueClick();
                 }

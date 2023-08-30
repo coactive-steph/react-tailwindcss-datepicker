@@ -1,11 +1,29 @@
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
 import weekday from "dayjs/plugin/weekday";
 
+import { DATE_FORMAT, LANGUAGE } from "../constants";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 dayjs.extend(weekday);
 dayjs.extend(customParseFormat);
 
-import { DATE_FORMAT, LANGUAGE } from "../constants";
+const CURRENT_TIMEZONE = dayjs.tz.guess();
+
+export function _dayjs(date?: dayjs.ConfigType) {
+    return (date ? dayjs(date) : dayjs()).tz(CURRENT_TIMEZONE, true);
+}
+
+export function set_day_start(date: dayjs.Dayjs) {
+    return date.set("hour", 0).set("minute", 0).set("second", 0);
+}
+
+export function set_day_end(date: dayjs.Dayjs) {
+    return date.set("hour", 23).set("minute", 59).set("second", 59);
+}
 
 export function classNames(...classes: (false | null | undefined | string)[]) {
     return classes.filter(Boolean).join(" ");
@@ -74,28 +92,28 @@ export function formatDate(date: dayjs.Dayjs, format = DATE_FORMAT) {
 }
 
 export function parseFormattedDate(date: string, format = DATE_FORMAT) {
-    return dayjs(date, format);
+    return dayjs(date, format).tz(CURRENT_TIMEZONE, true);
 }
 
 export function getFirstDayInMonth(date: string | dayjs.Dayjs) {
     return {
-        ddd: formatDate(dayjs(date).startOf("month"), "ddd"),
-        basic: formatDate(dayjs(date).startOf("month")),
-        object: dayjs(date).startOf("month")
+        ddd: formatDate(dayjs(date).tz(CURRENT_TIMEZONE, true).startOf("month"), "ddd"),
+        basic: formatDate(dayjs(date).tz(CURRENT_TIMEZONE, true).startOf("month")),
+        object: dayjs(date).tz(CURRENT_TIMEZONE, true).startOf("month")
     };
 }
 
 export function getLastDayInMonth(date: string) {
     return {
-        ddd: formatDate(dayjs(date).endOf("month"), "ddd"),
-        basic: formatDate(dayjs(date).endOf("month")),
-        object: dayjs(date).endOf("month")
+        ddd: formatDate(dayjs(date).tz(CURRENT_TIMEZONE, true).endOf("month"), "ddd"),
+        basic: formatDate(dayjs(date).tz(CURRENT_TIMEZONE, true).endOf("month")),
+        object: dayjs(date).tz(CURRENT_TIMEZONE, true).endOf("month")
     };
 }
 
 export function getDaysInMonth(date: string | dayjs.Dayjs) {
-    if (!isNaN(dayjs(date).daysInMonth())) {
-        return [...generateArrayNumber(1, dayjs(date).daysInMonth())];
+    if (!isNaN(dayjs(date).tz(CURRENT_TIMEZONE, true).daysInMonth())) {
+        return [...generateArrayNumber(1, dayjs(date).tz(CURRENT_TIMEZONE, true).daysInMonth())];
     }
     return [];
 }

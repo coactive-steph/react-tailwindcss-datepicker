@@ -23,7 +23,7 @@ const Months: React.FC<Props> = ({ clickMonth }) => {
                         clickMonth(item);
                     }}
                 >
-                    <>{dayjs(`2022-${item}-01`).locale(i18n).format("MMM")}</>
+                    <>{_dayjs(`2022-${item}-01`).locale(i18n).format("MMM")}</>
                 </RoundedButton>
             ))}
         </div>

@@ -1,9 +1,8 @@
-import dayjs from "dayjs";
 import React, { useContext, useMemo } from "react";
 
 import { DAYS } from "../../constants";
 import DatepickerContext from "../../contexts/DatepickerContext";
-import { loadLanguageModule, shortString, ucFirst } from "../../helpers";
+import { _dayjs, loadLanguageModule, shortString, ucFirst } from "../../helpers";
 
 const Week: React.FC = () => {
     const { i18n, startWeekOn } = useContext(DatepickerContext);
@@ -38,7 +37,7 @@ const Week: React.FC = () => {
                 <div key={item} className="tracking-wide text-gray-500 text-center">
                     {ucFirst(
                         shortString(
-                            dayjs(`2022-11-${6 + (item + startDateModifier)}`)
+                            _dayjs(`2022-11-${6 + (item + startDateModifier)}`)
                                 .locale(i18n)
                                 .format("ddd")
                         )

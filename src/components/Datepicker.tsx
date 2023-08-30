@@ -7,7 +7,7 @@ import Input from "../components/Input";
 import Shortcuts from "../components/Shortcuts";
 import { COLORS, DATE_FORMAT, DEFAULT_COLOR, LANGUAGE } from "../constants";
 import DatepickerContext from "../contexts/DatepickerContext";
-import { formatDate, nextMonth, previousMonth } from "../helpers";
+import { _dayjs, formatDate, nextMonth, previousMonth } from "../helpers";
 import useOnClickOutside from "../hooks";
 import { Period, DatepickerType } from "../types";
 
@@ -49,7 +49,7 @@ const Datepicker: React.FC<DatepickerType> = ({
 
     // State
     const [firstDate, setFirstDate] = useState<dayjs.Dayjs>(
-        startFrom && dayjs(startFrom).isValid() ? dayjs(startFrom) : dayjs()
+        startFrom && _dayjs(startFrom).isValid() ? _dayjs(startFrom) : _dayjs()
     );
     const [secondDate, setSecondDate] = useState<dayjs.Dayjs>(nextMonth(firstDate));
     const [period, setPeriod] = useState<Period>({
@@ -95,8 +95,8 @@ const Datepicker: React.FC<DatepickerType> = ({
     /* Start First */
     const firstGotoDate = useCallback(
         (date: dayjs.Dayjs) => {
-            const newDate = dayjs(formatDate(date));
-            const reformatDate = dayjs(formatDate(secondDate));
+            const newDate = _dayjs(formatDate(date));
+            const reformatDate = _dayjs(formatDate(secondDate));
             if (newDate.isSame(reformatDate) || newDate.isAfter(reformatDate)) {
                 setSecondDate(nextMonth(date));
             }
@@ -115,14 +115,14 @@ const Datepicker: React.FC<DatepickerType> = ({
 
     const changeFirstMonth = useCallback(
         (month: number) => {
-            firstGotoDate(dayjs(`${firstDate.year()}-${month < 10 ? "0" : ""}${month}-01`));
+            firstGotoDate(_dayjs(`${firstDate.year()}-${month < 10 ? "0" : ""}${month}-01`));
         },
         [firstDate, firstGotoDate]
     );
 
     const changeFirstYear = useCallback(
         (year: number) => {
-            firstGotoDate(dayjs(`${year}-${firstDate.month() + 1}-01`));
+            firstGotoDate(_dayjs(`${year}-${firstDate.month() + 1}-01`));
         },
         [firstDate, firstGotoDate]
     );
@@ -131,8 +131,8 @@ const Datepicker: React.FC<DatepickerType> = ({
     /* Start Second */
     const secondGotoDate = useCallback(
         (date: dayjs.Dayjs) => {
-            const newDate = dayjs(formatDate(date, displayFormat));
-            const reformatDate = dayjs(formatDate(firstDate, displayFormat));
+            const newDate = _dayjs(formatDate(date, displayFormat));
+            const reformatDate = _dayjs(formatDate(firstDate, displayFormat));
             if (newDate.isSame(reformatDate) || newDate.isBefore(reformatDate)) {
                 setFirstDate(previousMonth(date));
             }
@@ -151,14 +151,14 @@ const Datepicker: React.FC<DatepickerType> = ({
 
     const changeSecondMonth = useCallback(
         (month: number) => {
-            secondGotoDate(dayjs(`${secondDate.year()}-${month < 10 ? "0" : ""}${month}-01`));
+            secondGotoDate(_dayjs(`${secondDate.year()}-${month < 10 ? "0" : ""}${month}-01`));
         },
         [secondDate, secondGotoDate]
     );
 
     const changeSecondYear = useCallback(
         (year: number) => {
-            secondGotoDate(dayjs(`${year}-${secondDate.month() + 1}-01`));
+            secondGotoDate(_dayjs(`${year}-${secondDate.month() + 1}-01`));
         },
         [secondDate, secondGotoDate]
     );
@@ -185,8 +185,8 @@ const Datepicker: React.FC<DatepickerType> = ({
 
     useEffect(() => {
         if (value && value.startDate && value.endDate) {
-            const startDate = dayjs(value.startDate);
-            const endDate = dayjs(value.endDate);
+            const startDate = _dayjs(value.startDate);
+            const endDate = _dayjs(value.endDate);
             const validDate = startDate.isValid() && endDate.isValid();
             const condition =
                 validDate && (startDate.isSame(endDate) || startDate.isBefore(endDate));
@@ -213,13 +213,13 @@ const Datepicker: React.FC<DatepickerType> = ({
     }, [asSingle, value, displayFormat, separator]);
 
     useEffect(() => {
-        if (startFrom && dayjs(startFrom).isValid()) {
+        if (startFrom && _dayjs(startFrom).isValid()) {
             if (value?.startDate != null) {
-                setFirstDate(dayjs(value.startDate));
-                setSecondDate(nextMonth(dayjs(value.startDate)));
+                setFirstDate(_dayjs(value.startDate));
+                setSecondDate(nextMonth(_dayjs(value.startDate)));
             } else {
-                setFirstDate(dayjs(startFrom));
-                setSecondDate(nextMonth(dayjs(startFrom)));
+                setFirstDate(_dayjs(startFrom));
+                setSecondDate(nextMonth(_dayjs(startFrom)));
             }
         }
     }, [startFrom, value]);

@@ -1,9 +1,8 @@
-import dayjs from "dayjs";
 import React, { useCallback, useContext, useEffect, useRef } from "react";
 
 import { BORDER_COLOR, DATE_FORMAT, RING_COLOR } from "../constants";
 import DatepickerContext from "../contexts/DatepickerContext";
-import { dateIsValid, parseFormattedDate } from "../helpers";
+import { _dayjs, dateIsValid, parseFormattedDate } from "../helpers";
 
 import ToggleButton from "./ToggleButton";
 
@@ -84,7 +83,7 @@ const Input: React.FC<Props> = (e: Props) => {
                 end.length === 10 &&
                 dateIsValid(new Date(start)) &&
                 dateIsValid(new Date(end)) &&
-                (dayjs(start).isBefore(end) || asSingle)
+                (_dayjs(start).isBefore(_dayjs(end)) || asSingle)
             ) {
                 changeDatepickerValue(
                     {
@@ -93,7 +92,7 @@ const Input: React.FC<Props> = (e: Props) => {
                     },
                     e.target
                 );
-                if (!asSingle) changeDayHover(dayjs(end).add(-1, "day").format(DATE_FORMAT));
+                if (!asSingle) changeDayHover(_dayjs(end).add(-1, "day").format(DATE_FORMAT));
                 else changeDayHover(start);
                 hideDatepicker();
                 if (input) {

@@ -23,7 +23,7 @@ export const DEFAULT_COLOR = "blue";
 
 export const LANGUAGE = "en";
 
-export const DATE_FORMAT = "YYYY-MM-DD";
+export const DATE_FORMAT = "YYYY-MM-DD HH:mm:ss";
 
 export const START_WEEK = "sun";
 
