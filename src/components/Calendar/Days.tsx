@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
-import React, { useCallback, useContext, useEffect } from "react";
+import React, { useCallback, useContext } from "react";
 
 import { BG_COLOR, TEXT_COLOR } from "../../constants";
 import DatepickerContext from "../../contexts/DatepickerContext";

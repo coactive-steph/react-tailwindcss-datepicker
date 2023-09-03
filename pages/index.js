@@ -4,7 +4,7 @@ import { COLORS } from "../src/constants";
 import dayjs from "dayjs";
 import Head from "next/head";
 
-const DAYJS_DISPLAY_FORMAT = 'MMM D, YYYY h:mma';
+const DAYJS_DISPLAY_FORMAT = "MMM D, YYYY h:mma";
 
 export default function Playground() {
     const [value, setValue] = useState({
@@ -16,7 +16,9 @@ export default function Playground() {
     const [showFooter, setShowFooter] = useState(false);
     const [showShortcuts, setShowShortcuts] = useState(true);
     const [asSingle, setAsSingle] = useState(false);
-    const [placeholder, setPlaceholder] = useState(useRange ? 'MM/DD/YYYY to MM/DD/YYYY' : 'MM/DD/YYYY');
+    const [placeholder, setPlaceholder] = useState(
+        useRange ? "MM/DD/YYYY to MM/DD/YYYY" : "MM/DD/YYYY"
+    );
     const [separator, setSeparator] = useState("to");
     const [i18n, setI18n] = useState("en");
     const [disabled, setDisabled] = useState(false);
@@ -57,40 +59,40 @@ export default function Playground() {
                     useRange={useRange}
                     showFooter={showFooter}
                     showShortcuts={showShortcuts}
-                    // configs={{
-                    //     shortcuts: {
-                    //         today: "TText",
-                    //         yesterday: "YText",
-                    //         past: period => `P-${period} Text`,
-                    //         currentMonth: "CMText",
-                    //         pastMonth: "PMText",
-                    //         last3Days: {
-                    //             text: "Last 3 days",
-                    //             period: {
-                    //                 start: new Date(new Date().setDate(new Date().getDate() - 3)),
-                    //                 end: new Date()
-                    //             }
-                    //         },
-                    //         thisDay: {
-                    //             text: "This Day",
-                    //             period: {
-                    //                 start: new Date(),
-                    //                 end: new Date()
-                    //             }
-                    //         },
-                    //         next8Days: {
-                    //             text: "Next 8 days",
-                    //             period: {
-                    //                 start: new Date(),
-                    //                 end: new Date(new Date().setDate(new Date().getDate() + 8))
-                    //             }
-                    //         }
-                    //     },
-                    //     footer: {
-                    //         cancel: "CText",
-                    //         apply: "AText"
-                    //     }
-                    // }}
+                    configs={{
+                        shortcuts: {
+                            today: "TText",
+                            yesterday: "YText",
+                            past: period => `P-${period} Text`,
+                            currentMonth: "CMText",
+                            pastMonth: "PMText",
+                            last3Days: {
+                                text: "Last 3 days",
+                                period: {
+                                    start: new Date(new Date().setDate(new Date().getDate() - 3)),
+                                    end: new Date()
+                                }
+                            },
+                            thisDay: {
+                                text: "This Day",
+                                period: {
+                                    start: new Date(),
+                                    end: new Date()
+                                }
+                            },
+                            next8Days: {
+                                text: "Next 8 days",
+                                period: {
+                                    start: new Date(),
+                                    end: new Date(new Date().setDate(new Date().getDate() + 8))
+                                }
+                            }
+                        },
+                        footer: {
+                            cancel: "CText",
+                            apply: "AText"
+                        }
+                    }}
                     asSingle={asSingle}
                     placeholder={placeholder}
                     separator={separator}
@@ -112,20 +114,20 @@ export default function Playground() {
                         return isEmpty ? "Select Date" : "Clear";
                     }}
                     popoverDirection={"down"}
-                    // classNames={{
-                    //     input: ({ disabled, readOnly, className }) => {
-                    //         if (disabled) {
-                    //             return "opacity-40";
-                    //         }
-                    //         return `className`;
-                    //     },
-                    //     toggleButton: () => {
-                    //         return "bg-blue-300 ease-in-out";
-                    //     },
-                    //     footer: () => {
-                    //         return `p-4 border-t border-gray-600 flex flex-row flex-wrap justify-end`;
-                    //     }
-                    // }}
+                    classNames={{
+                        input: ({ disabled, readOnly, className }) => {
+                            if (disabled) {
+                                return "opacity-40";
+                            }
+                            return `className`;
+                        },
+                        toggleButton: () => {
+                            return "bg-blue-300 ease-in-out";
+                        },
+                        footer: () => {
+                            return `p-4 border-t border-gray-600 flex flex-row flex-wrap justify-end`;
+                        }
+                    }}
                 />
             </div>
             <div className="py-4 max-w-3xl mx-auto flex flex-row flex-wrap">
