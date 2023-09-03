@@ -11,8 +11,8 @@ styles
 .rollup.cache
 ## Files
 babel.config.json
-tsconfig.json
-rollup.config.js
+tsconfig.js
+rollup.config.mjs
 next-env.d.ts
 next.config.js
 .gitignore

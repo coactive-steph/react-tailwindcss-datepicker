@@ -92,7 +92,8 @@ export function formatDate(date: dayjs.Dayjs, format: string | undefined = undef
 }
 
 export function parseFormattedDate(date: string, format: string | undefined = undefined) {
-    return dayjs(date, format).tz(CURRENT_TIMEZONE, true);
+    const strict = true;
+    return dayjs(date, format, strict).tz(CURRENT_TIMEZONE, true);
 }
 
 export function getFirstDayInMonth(date: string | dayjs.Dayjs) {
@@ -116,6 +117,34 @@ export function getDaysInMonth(date: string | dayjs.Dayjs) {
         return [...generateArrayNumber(1, dayjs(date).tz(CURRENT_TIMEZONE, true).daysInMonth())];
     }
     return [];
+}
+
+export function isSameYearMonthDay(
+    date1: string | dayjs.Dayjs | undefined,
+    date2: string | dayjs.Dayjs | undefined
+) {
+    if (!date1 || !date2) {
+        return false;
+    }
+    const dayJs1 = dayjs(date1);
+    const dayJs2 = dayjs(date2);
+    return (
+        dayJs1.isSame(dayJs2, "year") &&
+        dayJs1.isSame(dayJs2, "month") &&
+        dayJs1.isSame(dayJs2, "day")
+    );
+}
+
+export function isSameMonthYear(
+    date1: string | dayjs.Dayjs | undefined,
+    date2: string | dayjs.Dayjs | undefined
+) {
+    if (!date1 || !date2) {
+        return false;
+    }
+    const dayJs1 = dayjs(date1);
+    const dayJs2 = dayjs(date2);
+    return dayJs1.isSame(dayJs2, "year") && dayJs1.isSame(dayJs2, "month");
 }
 
 export function nextMonth(date: dayjs.Dayjs) {
@@ -643,4 +672,8 @@ export function loadLanguageModule(language = LANGUAGE) {
 
 export function dateIsValid(date: Date | number) {
     return date instanceof Date && !isNaN(date.getTime());
+}
+
+export function xor<T>(val1: T, val2: T) {
+    return (val1 ? 1 : 0) ^ (val2 ? 1 : 0);
 }

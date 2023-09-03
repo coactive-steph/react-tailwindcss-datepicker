@@ -1,22 +1,22 @@
 import commonjs from "@rollup/plugin-commonjs";
 import resolve from "@rollup/plugin-node-resolve";
 import typescript from "@rollup/plugin-typescript";
+import peerDepsExternal from "rollup-plugin-peer-deps-external";
 
-const packageJson = require("./package.json");
-const options = require("./tsconfig.json");
+import pkg from "./package.json" assert { type: "json" };
 
-module.exports = {
+const config = {
     input: "src/index.tsx",
     output: [
         {
-            file: packageJson.main,
+            file: pkg.main,
             format: "cjs",
             exports: "auto",
             sourcemap: true,
             inlineDynamicImports: true
         },
         {
-            file: packageJson.module,
+            file: pkg.module,
             format: "esm",
             exports: "auto",
             sourcemap: true,
@@ -24,5 +24,12 @@ module.exports = {
         }
     ],
     external: ["react", "dayjs"],
-    plugins: [resolve(), commonjs(), typescript({ ...options.compilerOptions, jsx: "react" })]
+    plugins: [
+        peerDepsExternal(),
+        resolve(),
+        commonjs(),
+        typescript({ tsconfig: "./tsconfig.json", jsx: "react" })
+    ]
 };
+
+export default config;

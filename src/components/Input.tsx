@@ -1,8 +1,8 @@
-import React, { useCallback, useContext, useEffect, useRef } from "react";
+import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 
 import { BORDER_COLOR, RING_COLOR } from "../constants";
 import DatepickerContext from "../contexts/DatepickerContext";
-import { _dayjs, dateIsValid, parseFormattedDate } from "../helpers";
+import { _dayjs, formatDate, parseFormattedDate } from "../helpers";
 
 import ToggleButton from "./ToggleButton";
 
@@ -21,7 +21,6 @@ const Input: React.FC<Props> = (e: Props) => {
         arrowContainer,
         inputText,
         changeInputText,
-        hideDatepicker,
         changeDatepickerValue,
         asSingle,
         placeholder,
@@ -41,6 +40,32 @@ const Input: React.FC<Props> = (e: Props) => {
     // UseRefs
     const buttonRef = useRef<HTMLButtonElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
+    const [inputError, setInputError] = useState(false);
+
+    const parseValueFromInput = useCallback(
+        (value: string) => {
+            const start = parseFormattedDate(value.split(" " + separator + " ")[0], displayFormat);
+            const end = asSingle
+                ? start
+                : parseFormattedDate(value.split(" " + separator + " ")[1], displayFormat);
+            if (
+                start.isValid() &&
+                (asSingle || (end.isValid() && _dayjs(start).isBefore(_dayjs(end))))
+            ) {
+                return { start, end };
+            }
+            return { start: null, end: null };
+        },
+        [separator, displayFormat, asSingle]
+    );
+
+    useEffect(() => {
+        const parsedValue = parseValueFromInput(inputText);
+        const hasError = Boolean(
+            inputText.trim() && (!parsedValue?.start?.isValid() || !parsedValue?.end.isValid())
+        );
+        setInputError(hasError);
+    }, [inputText, parseValueFromInput]);
 
     // Functions
     const getClassName = useCallback(() => {
@@ -53,63 +78,47 @@ const Input: React.FC<Props> = (e: Props) => {
         const border = BORDER_COLOR.focus[primaryColor as keyof typeof BORDER_COLOR.focus];
         const ring =
             RING_COLOR["second-focus"][primaryColor as keyof (typeof RING_COLOR)["second-focus"]];
-
-        const defaultInputClassName = `relative transition-all duration-300 py-2.5 pl-4 pr-14 w-full border-gray-300 dark:bg-slate-800 dark:text-white/80 dark:border-slate-600 rounded-lg tracking-wide font-light text-sm placeholder-gray-400 bg-white focus:ring disabled:opacity-40 disabled:cursor-not-allowed ${border} ${ring}`;
+        const textColor = inputError ? "text-red-500" : "";
+        const defaultInputClassName = `relative transition-all duration-300 py-2.5 pl-4 pr-14 w-full border-gray-300 dark:bg-slate-800 dark:text-white/80 dark:border-slate-600 rounded-lg tracking-wide font-light text-sm placeholder-gray-400 bg-white focus:ring disabled:opacity-40 disabled:cursor-not-allowed ${border} ${ring} ${textColor}`;
 
         return typeof inputClassName === "function"
             ? inputClassName(defaultInputClassName)
             : typeof inputClassName === "string" && inputClassName !== ""
             ? inputClassName
             : defaultInputClassName;
-    }, [inputRef, classNames, primaryColor, inputClassName]);
+    }, [inputRef, classNames, primaryColor, inputClassName, inputError]);
 
     const handleInputChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
-            const inputValue = e.target.value;
-
-            const start = parseFormattedDate(inputValue.slice(0, 10), displayFormat).format(
-                displayFormat
-            );
-            const end = asSingle
-                ? start
-                : parseFormattedDate(inputValue.slice(11, inputValue.length), displayFormat).format(
-                      displayFormat
-                  );
-
-            const input = inputRef?.current;
-
+            changeInputText(e.target.value);
+            const date = parseValueFromInput(e.target.value);
             if (
-                start.length === 10 &&
-                end.length === 10 &&
-                dateIsValid(new Date(start)) &&
-                dateIsValid(new Date(end)) &&
-                (_dayjs(start).isBefore(_dayjs(end)) || asSingle)
+                date?.start?.isValid() &&
+                (asSingle || (date?.end.isValid() && date.start.isBefore(date.end)))
             ) {
                 changeDatepickerValue(
                     {
-                        startDate: start,
-                        endDate: end
+                        startDate: formatDate(date.start),
+                        endDate: formatDate(date.end)
                     },
                     e.target
                 );
-                if (!asSingle) changeDayHover(_dayjs(end).add(-1, "day").format(displayFormat));
-                else changeDayHover(start);
-                hideDatepicker();
-                if (input) {
-                    input.blur();
+                if (!asSingle) {
+                    changeDayHover(formatDate(_dayjs(date.end).add(-1, "day")));
+                } else {
+                    changeDayHover(formatDate(date.start));
                 }
             }
-            changeInputText(e.target.value);
         },
-        [
-            changeDatepickerValue,
-            changeDayHover,
-            changeInputText,
-            hideDatepicker,
-            displayFormat,
-            asSingle
-        ]
+        [changeInputText, parseValueFromInput, asSingle, changeDatepickerValue, changeDayHover]
     );
+
+    const handleInputBlur = useCallback(() => {
+        if (inputError) {
+            setInputError(false);
+            changeInputText("");
+        }
+    }, [changeInputText, inputError]);
 
     const renderToggleIcon = useCallback(
         (isEmpty: boolean) => {
@@ -164,15 +173,13 @@ const Input: React.FC<Props> = (e: Props) => {
                     if (dayHover) {
                         changeDayHover(null);
                     }
-                    if (period.start && period.end) {
-                        changeDatepickerValue(
-                            {
-                                startDate: null,
-                                endDate: null
-                            },
-                            input
-                        );
-                    }
+                    changeDatepickerValue(
+                        {
+                            startDate: null,
+                            endDate: null
+                        },
+                        input
+                    );
                 }
             }
         }
@@ -265,6 +272,7 @@ const Input: React.FC<Props> = (e: Props) => {
                 autoComplete="off"
                 role="presentation"
                 onChange={handleInputChange}
+                onBlur={handleInputBlur}
             />
 
             <button

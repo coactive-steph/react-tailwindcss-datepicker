@@ -114,8 +114,9 @@ const Calendar: React.FC<Props> = ({
             const fullDay = `${year}-${month}-${day}`;
             let newStart;
             let newEnd = null;
+            let updatedValue = false;
 
-            function choosePeriod(start: string, end: string) {
+            function updateValue(start: string, end: string) {
                 const ipt = input?.current;
                 changeDatepickerValue(
                     {
@@ -127,16 +128,6 @@ const Calendar: React.FC<Props> = ({
                 hideDatepicker();
             }
 
-            if (period.start && period.end) {
-                if (changeDayHover) {
-                    changeDayHover(null);
-                }
-                changePeriod({
-                    start: null,
-                    end: null
-                });
-            }
-
             if ((!period.start && !period.end) || (period.start && period.end)) {
                 if (!period.start && !period.end) {
                     changeDayHover(fullDay);
@@ -144,7 +135,8 @@ const Calendar: React.FC<Props> = ({
                 newStart = fullDay;
                 if (asSingle) {
                     newEnd = fullDay;
-                    choosePeriod(fullDay, fullDay);
+                    updatedValue = true;
+                    updateValue(fullDay, fullDay);
                 }
             } else {
                 if (period.start && !period.end) {
@@ -167,12 +159,13 @@ const Calendar: React.FC<Props> = ({
 
                 if (!showFooter) {
                     if (newStart && newEnd) {
-                        choosePeriod(newStart, newEnd);
+                        updatedValue = true;
+                        updateValue(newStart, newEnd);
                     }
                 }
             }
 
-            if (!(newEnd && newStart) || showFooter) {
+            if (!updatedValue && !showFooter) {
                 changePeriod({
                     start: newStart,
                     end: newEnd

@@ -4,6 +4,8 @@ import { COLORS } from "../src/constants";
 import dayjs from "dayjs";
 import Head from "next/head";
 
+const DAYJS_DISPLAY_FORMAT = 'MMM D, YYYY h:mma';
+
 export default function Playground() {
     const [value, setValue] = useState({
         startDate: null,
@@ -12,22 +14,22 @@ export default function Playground() {
     const [primaryColor, setPrimaryColor] = useState("blue");
     const [useRange, setUseRange] = useState(true);
     const [showFooter, setShowFooter] = useState(false);
-    const [showShortcuts, setShowShortcuts] = useState(false);
+    const [showShortcuts, setShowShortcuts] = useState(true);
     const [asSingle, setAsSingle] = useState(false);
-    const [placeholder, setPlaceholder] = useState("");
-    const [separator, setSeparator] = useState("~");
+    const [placeholder, setPlaceholder] = useState(useRange ? 'MM/DD/YYYY to MM/DD/YYYY' : 'MM/DD/YYYY');
+    const [separator, setSeparator] = useState("to");
     const [i18n, setI18n] = useState("en");
     const [disabled, setDisabled] = useState(false);
     const [inputClassName, setInputClassName] = useState("");
     const [containerClassName, setContainerClassName] = useState("");
     const [toggleClassName, setToggleClassName] = useState("");
-    const [displayFormat, setDisplayFormat] = useState("YYYY-MM-DD");
+    const [displayFormat, setDisplayFormat] = useState(DAYJS_DISPLAY_FORMAT);
     const [readOnly, setReadOnly] = useState(false);
     const [minDate, setMinDate] = useState("");
     const [maxDate, setMaxDate] = useState("");
     const [disabledDates, setDisabledDates] = useState([]);
     const [newDisabledDates, setNewDisabledDates] = useState({ startDate: "", endDate: "" });
-    const [startFrom, setStartFrom] = useState("2023-03-01");
+    const [startFrom, setStartFrom] = useState("");
     const [startWeekOn, setStartWeekOn] = useState("");
 
     const handleChange = (value, e) => {

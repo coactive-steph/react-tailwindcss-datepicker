@@ -7,9 +7,9 @@ import Input from "../components/Input";
 import Shortcuts from "../components/Shortcuts";
 import { COLORS, DEFAULT_COLOR, DEFAULT_DISPLAY_FORMAT, LANGUAGE } from "../constants";
 import DatepickerContext from "../contexts/DatepickerContext";
-import { _dayjs, formatDate, nextMonth, previousMonth } from "../helpers";
+import { _dayjs, formatDate, isSameMonthYear, nextMonth, previousMonth } from "../helpers";
 import useOnClickOutside from "../hooks";
-import { Period, DatepickerType } from "../types";
+import { Period, DatepickerType, DateValueType } from "../types";
 
 import { Arrow, VerticalDash } from "./utils";
 
@@ -68,6 +68,21 @@ const Datepicker: React.FC<DatepickerType> = ({
         }
     });
 
+    const setDateInInputText = useCallback(
+        (date: DateValueType) => {
+            if (date?.startDate && date.endDate) {
+                setInputText(
+                    `${formatDate(_dayjs(date.startDate), displayFormat)}${
+                        useRange
+                            ? ` ${separator} ${formatDate(_dayjs(date.endDate), displayFormat)}`
+                            : ""
+                    }`
+                );
+            }
+        },
+        [displayFormat, separator, useRange]
+    );
+
     // Functions
     const hideDatepicker = useCallback(() => {
         const div = calendarContainerRef.current;
@@ -90,7 +105,14 @@ const Datepicker: React.FC<DatepickerType> = ({
                 arrow.classList.add("border-t");
             }, 300);
         }
-    }, []);
+        setDateInInputText(value);
+        if (useRange) {
+            setPeriod({
+                start: null,
+                end: null
+            });
+        }
+    }, [value, setDateInInputText, useRange, setPeriod]);
 
     /* Start First */
     const firstGotoDate = useCallback(
@@ -105,6 +127,7 @@ const Datepicker: React.FC<DatepickerType> = ({
         [secondDate]
     );
 
+    // Click handler for the "<" icon on the first (left) month.
     const previousMonthFirst = useCallback(() => {
         setFirstDate(previousMonth(firstDate));
     }, [firstDate]);
@@ -183,23 +206,32 @@ const Datepicker: React.FC<DatepickerType> = ({
         }
     }, []);
 
+    // Log the value when it changes
     useEffect(() => {
-        if (value && value.startDate && value.endDate) {
+        // Set second month to month after start date if there is no end date or the end date is the
+        // same month as the start date.
+        if (
+            value?.startDate &&
+            (!value?.endDate || isSameMonthYear(_dayjs(value.startDate), _dayjs(value.endDate)))
+        ) {
+            setSecondDate(nextMonth(_dayjs(value?.startDate)));
+        } else if (value?.endDate) {
+            setSecondDate(_dayjs(value?.endDate));
+        }
+    }, [value]);
+
+    useEffect(() => {
+        if (value?.startDate && value.endDate) {
             const startDate = _dayjs(value.startDate);
             const endDate = _dayjs(value.endDate);
             const validDate = startDate.isValid() && endDate.isValid();
-            const condition =
+            const isValidValue =
                 validDate && (startDate.isSame(endDate) || startDate.isBefore(endDate));
-            if (condition) {
+            if (isValidValue) {
                 setPeriod({
-                    start: formatDate(startDate),
-                    end: formatDate(endDate)
+                    start: null,
+                    end: null
                 });
-                setInputText(
-                    `${formatDate(startDate, displayFormat)}${
-                        asSingle ? "" : ` ${separator} ${formatDate(endDate, displayFormat)}`
-                    }`
-                );
             }
         }
 
@@ -210,7 +242,13 @@ const Datepicker: React.FC<DatepickerType> = ({
             });
             setInputText("");
         }
-    }, [asSingle, value, displayFormat, separator]);
+    }, [value]);
+
+    useEffect(() => {
+        if (value?.startDate && (!useRange || value.endDate)) {
+            setDateInInputText(value);
+        }
+    }, [value, useRange, setDateInInputText]);
 
     useEffect(() => {
         if (startFrom && _dayjs(startFrom).isValid()) {
@@ -268,7 +306,8 @@ const Datepicker: React.FC<DatepickerType> = ({
             classNames,
             onChange,
             input: inputRef,
-            popoverDirection
+            popoverDirection,
+            useRange
         };
     }, [
         asSingle,
@@ -300,7 +339,8 @@ const Datepicker: React.FC<DatepickerType> = ({
         startWeekOn,
         classNames,
         inputRef,
-        popoverDirection
+        popoverDirection,
+        useRange
     ]);
 
     const containerClassNameOverload = useMemo(() => {

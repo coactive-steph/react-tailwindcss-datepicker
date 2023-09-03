@@ -48,6 +48,7 @@ interface DatepickerStore {
     inputName?: string;
     classNames?: ClassNamesTypeProp;
     popoverDirection?: PopoverDirectionType;
+    useRange?: boolean;
 }
 
 const DatepickerContext = createContext<DatepickerStore>({
@@ -94,7 +95,8 @@ const DatepickerContext = createContext<DatepickerStore>({
     startWeekOn: START_WEEK,
     toggleIcon: undefined,
     classNames: undefined,
-    popoverDirection: undefined
+    popoverDirection: undefined,
+    useRange: false
 });
 
 export default DatepickerContext;

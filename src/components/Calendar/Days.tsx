@@ -1,10 +1,17 @@
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
-import React, { useCallback, useContext } from "react";
+import React, { useCallback, useContext, useEffect } from "react";
 
 import { BG_COLOR, TEXT_COLOR } from "../../constants";
 import DatepickerContext from "../../contexts/DatepickerContext";
-import { formatDate, nextMonth, previousMonth, classNames as cn, _dayjs } from "../../helpers";
+import {
+    nextMonth,
+    previousMonth,
+    classNames as cn,
+    _dayjs,
+    isSameYearMonthDay,
+    xor
+} from "../../helpers";
 import { Period } from "../../types";
 
 dayjs.extend(isBetween);
@@ -38,7 +45,8 @@ const Days: React.FC<Props> = ({
         changeDayHover,
         minDate,
         maxDate,
-        disabledDates
+        disabledDates,
+        value
     } = useContext(DatepickerContext);
 
     // Functions
@@ -47,7 +55,7 @@ const Days: React.FC<Props> = ({
             const itemDate = `${calendarData.date.year()}-${calendarData.date.month() + 1}-${
                 item >= 10 ? item : "0" + item
             }`;
-            if (formatDate(_dayjs()) === formatDate(_dayjs(itemDate)))
+            if (isSameYearMonthDay(itemDate, _dayjs()))
                 return TEXT_COLOR["500"][primaryColor as keyof (typeof TEXT_COLOR)["500"]];
             return "";
         },
@@ -59,39 +67,54 @@ const Days: React.FC<Props> = ({
             const fullDay = `${calendarData.date.year()}-${calendarData.date.month() + 1}-${day}`;
             let className = "";
 
+            const periodSet = period.start || period.end;
+            const periodStartRaw = periodSet ? period.start : value?.startDate;
+            const periodEndRaw = periodSet ? period.end : value?.endDate;
+            const periodStart = periodStartRaw ? _dayjs(periodStartRaw) : null;
+            const periodEnd = periodEndRaw ? _dayjs(periodEndRaw) : null;
+
             if (
-                _dayjs(fullDay).isSame(_dayjs(period.start)) &&
-                _dayjs(fullDay).isSame(_dayjs(period.end))
+                (periodStart &&
+                    !periodEnd &&
+                    (!dayHover || (dayHover && isSameYearMonthDay(dayHover, periodStart))) &&
+                    isSameYearMonthDay(fullDay, periodStart)) ||
+                (!periodStart &&
+                    periodEnd &&
+                    (!dayHover || (dayHover && isSameYearMonthDay(dayHover, periodEnd))) &&
+                    isSameYearMonthDay(fullDay, periodEnd)) ||
+                (periodStart &&
+                    periodEnd &&
+                    isSameYearMonthDay(fullDay, periodStart) &&
+                    isSameYearMonthDay(fullDay, periodEnd))
             ) {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 className = ` ${BG_COLOR["500"][primaryColor]} text-white font-medium rounded-full`;
-            } else if (_dayjs(fullDay).isSame(_dayjs(period.start))) {
+            } else if (periodStart && isSameYearMonthDay(fullDay, periodStart)) {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
-                className = ` ${BG_COLOR["500"][primaryColor]} text-white font-medium ${
-                    _dayjs(fullDay).isSame(_dayjs(dayHover)) && !period.end
-                        ? "rounded-full"
-                        : "rounded-l-full"
-                }`;
-            } else if (_dayjs(fullDay).isSame(_dayjs(period.end))) {
+                className = ` ${BG_COLOR["500"][primaryColor]} text-white font-medium rounded-l-full`;
+            } else if (periodEnd && isSameYearMonthDay(fullDay, periodEnd)) {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
-                className = ` ${BG_COLOR["500"][primaryColor]} text-white font-medium ${
-                    _dayjs(fullDay).isSame(_dayjs(dayHover)) && !period.start
-                        ? "rounded-full"
-                        : "rounded-r-full"
-                }`;
+                className = ` ${BG_COLOR["500"][primaryColor]} text-white font-medium rounded-r-full`;
             }
-
             return {
                 active:
-                    _dayjs(fullDay).isSame(_dayjs(period.start)) ||
-                    _dayjs(fullDay).isSame(_dayjs(period.end)),
+                    (periodStart && isSameYearMonthDay(fullDay, periodStart)) ||
+                    (periodEnd && isSameYearMonthDay(fullDay, periodEnd)),
                 className: className
             };
         },
-        [calendarData.date, dayHover, period.end, period.start, primaryColor]
+        [
+            calendarData.date,
+            dayHover,
+            period.end,
+            period.start,
+            primaryColor,
+            value?.endDate,
+            value?.startDate
+        ]
     );
 
     const hoverClassByDay = useCallback(
@@ -101,11 +124,17 @@ const Days: React.FC<Props> = ({
                 day >= 10 ? day : "0" + day
             }`;
 
-            if (period.start && period.end) {
+            const periodSet = period.start || period.end;
+            const periodStartRaw = periodSet ? period.start : value?.startDate;
+            const periodEndRaw = periodSet ? period.end : value?.endDate;
+            const periodStart = periodStartRaw ? _dayjs(periodStartRaw) : null;
+            const periodEnd = periodEndRaw ? _dayjs(periodEndRaw) : null;
+
+            if (periodStart && periodEnd) {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 if (
-                    _dayjs(fullDay).isBetween(_dayjs(period.start), _dayjs(period.end), "day", "[)")
+                    _dayjs(fullDay).isBetween(_dayjs(periodStart), _dayjs(periodEnd), "day", "[)")
                 ) {
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-ignore
@@ -124,8 +153,10 @@ const Days: React.FC<Props> = ({
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             if (
-                period.start &&
-                _dayjs(fullDay).isBetween(_dayjs(period.start), _dayjs(dayHover), "day", "[)")
+                periodStart &&
+                !periodEnd &&
+                dayHover &&
+                _dayjs(fullDay).isBetween(_dayjs(periodStart), _dayjs(dayHover), undefined, "[)")
             ) {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
@@ -137,8 +168,10 @@ const Days: React.FC<Props> = ({
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             if (
-                period.end &&
-                _dayjs(fullDay).isBetween(_dayjs(dayHover), _dayjs(period.end), "day", "[)")
+                !periodStart &&
+                periodEnd &&
+                dayHover &&
+                _dayjs(fullDay).isBetween(_dayjs(dayHover), _dayjs(periodEnd), undefined, "[)")
             ) {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
@@ -147,18 +180,27 @@ const Days: React.FC<Props> = ({
                 )} dark:bg-white/10`;
             }
 
-            if (dayHover === fullDay) {
+            if (xor(periodStart, periodEnd) && dayHover === fullDay) {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 const bgColor = BG_COLOR["500"][primaryColor];
                 className = ` transition-all duration-500 text-white font-medium ${bgColor} ${
-                    period.start ? "rounded-r-full" : "rounded-l-full"
+                    periodStart ? "rounded-r-full" : "rounded-l-full"
                 }`;
             }
 
             return className;
         },
-        [calendarData.date, currentDateClass, dayHover, period.end, period.start, primaryColor]
+        [
+            calendarData.date,
+            currentDateClass,
+            dayHover,
+            period.end,
+            period.start,
+            primaryColor,
+            value?.endDate,
+            value?.startDate
+        ]
     );
 
     const isDateTooEarly = useCallback(

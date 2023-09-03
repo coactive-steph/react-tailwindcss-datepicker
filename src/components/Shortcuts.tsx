@@ -17,8 +17,6 @@ interface ItemTemplateProps {
 const ItemTemplate = React.memo((props: ItemTemplateProps) => {
     const {
         primaryColor,
-        period,
-        changePeriod,
         updateFirstDate,
         dayHover,
         changeDayHover,
@@ -38,13 +36,6 @@ const ItemTemplate = React.memo((props: ItemTemplateProps) => {
             if (dayHover) {
                 changeDayHover(null);
             }
-            if (period.start || period.end) {
-                changePeriod({
-                    start: null,
-                    end: null
-                });
-            }
-            changePeriod(item);
             changeDatepickerValue({
                 startDate: item.start,
                 endDate: item.end
@@ -52,16 +43,7 @@ const ItemTemplate = React.memo((props: ItemTemplateProps) => {
             updateFirstDate(_dayjs(item.start));
             hideDatepicker();
         },
-        [
-            changeDatepickerValue,
-            changeDayHover,
-            changePeriod,
-            dayHover,
-            hideDatepicker,
-            period.end,
-            period.start,
-            updateFirstDate
-        ]
+        [changeDatepickerValue, changeDayHover, dayHover, hideDatepicker, updateFirstDate]
     );
 
     const children = props?.children;
@@ -91,7 +73,7 @@ const Shortcuts: React.FC = () => {
 
     const shortcutOptions = useMemo<[string, ShortcutsItem | ShortcutsItem[]][]>(() => {
         let options;
-        if (configs?.shortcuts && configs?.shortcuts) {
+        if (configs?.shortcuts) {
             const formatConfig = Object.keys(configs.shortcuts).map(item => {
                 if (Object.keys(DEFAULT_SHORTCUTS).includes(item)) {
                     return [item, DEFAULT_SHORTCUTS[item]];
